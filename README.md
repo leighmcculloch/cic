@@ -2,7 +2,9 @@
 
 A personal set of recurring background tasks expressed as [Claude Code](https://docs.claude.com/en/docs/claude-code) skills, scheduled by a super-skill (`/auto`).
 
-These tasks are intended to be run inside `silo`, a sandboxing wrapper that scopes the Claude CLI's filesystem and network access. The `Makefile` targets invoke `silo claude` rather than `claude` directly, and the sandbox is configured via `silo.jsonc`.
+These tasks are intended to be run inside [silo], a sandboxing wrapper that scopes the Claude CLI's filesystem and network access. The `Makefile` targets invoke `silo claude` rather than `claude` directly, and the sandbox is configured via `silo.jsonc`.
+
+[silo]: https://github.com/leighmcculloch/silo
 
 ## Skills
 
