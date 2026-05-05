@@ -1,0 +1,7 @@
+{
+  "tools": {
+    "claude": {
+      "env": ["ENABLE_CLAUDEAI_MCP_SERVERS=true"]
+    }
+  }
+}
