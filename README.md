@@ -20,9 +20,17 @@ These tasks are intended to be run inside [silo], a sandboxing wrapper that scop
 
 ```
 .claude/skills/<name>/SKILL.md   # one directory per skill
+.mcp.json                        # project MCP server registry
+mcp/<name>/                      # in-repo MCP servers (e.g. slack-reactions)
 Makefile                         # one target per skill: `make <name>`
 silo.jsonc                       # silo sandbox config for `silo claude`
 ```
+
+## MCP servers
+
+| Server | Purpose |
+|---|---|
+| [`slack-reactions`](mcp/slack-reactions/README.md) | Adds emoji reactions to Slack messages (used by `/pr-emojis`). Requires `SLACK_TOKEN`. |
 
 ## Running
 
