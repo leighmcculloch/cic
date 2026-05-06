@@ -26,32 +26,37 @@ If I am the author of the PR, only the `:merged:` state applies — skip `:eyes:
 
 ## Tools
 
-This skill uses:
+This skill uses two Deno scripts plus another skill:
 
-- `.claude/skills/pr-emojis/classify/main.ts` — given my GitHub login and a list of PR URLs, emits JSONL with the chosen emoji per PR. Reads `GITHUB_TOKEN` from env. The rules above are encoded inside it — do **not** re-derive them in the agent. Directly executable via shebang.
+- `.claude/skills/pr-emojis/find/main.ts` — given my GitHub login and a day-window, hits the user activity API (`/users/<me>/events`) and emits one PR URL per line for every PR I've acted on (opened/merged/reviewed/commented). Reads `GITHUB_TOKEN`. Directly executable via shebang.
+- `.claude/skills/pr-emojis/classify/main.ts` — given my GitHub login and a list of PR URLs (args or stdin), emits JSONL with the chosen emoji per PR. Reads `GITHUB_TOKEN`. The rules above are encoded inside it — do **not** re-derive them in the agent.
 - The [`/slack-react`](../slack-react/SKILL.md) skill to post each reaction. See its SKILL.md for invocation; do not re-derive the deno command here.
 
 ## Procedure
 
-1. Confirm my GitHub identity via `mcp__github__get_me`. The classify CLI assumes `GITHUB_TOKEN` is set in env and resolves to that user.
-2. Search Slack for messages containing GitHub PR URLs using `slack_search_public_and_private` with a query like `https://github.com pull`. Page through results until the desired window is covered.
-3. From the messages, build a list of `(channel, ts, pr_url)` tuples where `pr_url` matches `https://github.com/<owner>/<repo>/pull/<number>`. A single Slack message may contribute multiple tuples.
-4. Take the **unique** set of `pr_url`s and pass them all to `classify/main.ts` in one invocation:
+The algorithm starts from **GitHub activity**, not Slack: list the PRs I've acted on recently, classify them, then for each PR with a non-null emoji search Slack for messages linking to that PR. This avoids the "Slack search window aged out the message" problem of the prior Slack-first design.
+
+1. Confirm my GitHub identity via `mcp__github__get_me`. Both Deno scripts assume `GITHUB_TOKEN` is set in env and resolves to that user.
+2. List the PRs I've touched in the last **3 days** and classify them in one pipeline:
    ```sh
-   .claude/skills/pr-emojis/classify/main.ts leighmcculloch <url1> <url2> ...
+   .claude/skills/pr-emojis/find/main.ts leighmcculloch 3 \
+     | .claude/skills/pr-emojis/classify/main.ts leighmcculloch \
+     | jq -c 'select(.emoji != null)'
    ```
-   The script emits one JSONL line per URL: `{"url": ..., "emoji": "eyes|speech_balloon|white_check_mark|merged"|null, "reason": "..."}`.
-5. Build a lookup `pr_url → emoji` from the script output. For each `(channel, ts, pr_url)` tuple where `emoji != null`:
-   - If my reaction with that emoji is already on the message, skip.
-   - Otherwise post the reaction via the [`/slack-react`](../slack-react/SKILL.md) skill (its SKILL.md is the source of truth for the invocation). `already_reacted` errors can be safely ignored.
-6. Report a brief summary of reactions applied.
+   The output is JSONL: `{"url": ..., "emoji": "eyes|speech_balloon|white_check_mark|merged", "reason": "..."}`. Each line is a PR with a desired reaction.
+3. For each `(pr_url, emoji)` in the output:
+   1. Search Slack for messages referencing `pr_url` using `slack_search_public_and_private` with the URL as the query (page through if there are many). Capture every message that mentions it.
+   2. For each Slack message:
+      - If my reaction with that emoji is already on the message, skip.
+      - Otherwise post the reaction via [`/slack-react`](../slack-react/SKILL.md). `already_reacted` is a benign duplicate signal and can be ignored.
+4. Report a brief summary of reactions applied (PR → emoji → message count).
 
 ## Rules
 
 - Never remove a reaction.
 - Never add a reaction that is already present from me.
 - Never react to messages that don't contain a PR URL.
-- Skip PRs the script returns as `emoji: null`.
-- If a single Slack message contains multiple PR URLs, evaluate each independently.
-- The script handles caching implicitly — pass each unique URL once and reuse the result for every message that links to it.
+- Skip PRs the classify script returns as `emoji: null`.
+- A Slack message may reference multiple PRs; the procedure iterates per-PR (step 3), so the same message may legitimately get multiple reactions across different PRs.
 - Do not re-implement the classification logic in the agent. The rules live in `classify/main.ts` so they stay in sync with this skill.
+- Do not re-implement PR discovery in the agent. The events-API logic lives in `find/main.ts`.
