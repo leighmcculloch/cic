@@ -12,6 +12,7 @@ These tasks are intended to be run inside [silo], a sandboxing wrapper that scop
 |---|---|
 | [`/auto`](.claude/skills/auto/SKILL.md) | Registers the other skills as recurring cron jobs in the running Claude session. |
 | [`/pr-emojis`](.claude/skills/pr-emojis/SKILL.md) | Reacts on Slack to messages linking to GitHub PRs I'm involved with, based on my review state. |
+| [`/pr-needs-review`](.claude/skills/pr-needs-review/SKILL.md) | Finds GitHub PRs posted in Slack over the last 3 days with no reviews and DMs a summary. |
 | [`/pr-reviews`](.claude/skills/pr-reviews/SKILL.md) | Picks a random unreviewed PR in the `@stellar` GitHub org, reviews it, and DMs the findings. |
 | [`/briefing`](.claude/skills/briefing/SKILL.md) | Drafts a standup update from Slack + GitHub + Calendar activity over the last N days and prepends it to the team Slack Canvas. |
 | [`/meeting-prep`](.claude/skills/meeting-prep/SKILL.md) | Drafts prep notes for today's meetings, pulling Slack + GitHub context from the last 7 days. |

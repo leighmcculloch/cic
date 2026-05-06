@@ -21,10 +21,12 @@ This skill skips the `/loop` parser and calls `CronCreate` directly — for two 
 | Skill | `/loop` equivalent | Cron |
 |---|---|---|
 | `/pr-emojis` | `/loop 5m /pr-emojis` (with off-`:00` skew) | `2-59/5 * * * *` |
-| `/pr-reviews` | (not expressible via `/loop` — daily cadence) | `7 4 * * *` |
+| `/pr-needs-review` | `/loop 30m /pr-needs-review` (with off-`:00`/`:30` skew) | `7,37 * * * *` |
+| `/pr-reviews` | (not expressible via `/loop` — daily cadence) | `0 4 * * *` |
 | `/briefing 1` | (not expressible via `/loop` — daily cadence) | `17 4 * * *` |
 | `/briefing 7` | (not expressible via `/loop` — weekly cadence) | `27 4 * * 1` |
 | `/meeting-prep` | (not expressible via `/loop` — daily cadence) | `37 4 * * *` |
+| `/compact` | `/loop 30m /compact` (with off-`:00`/`:30` skew) | `13,43 * * * *` |
 
 The cron minute fields are deliberately off `:00` to avoid the fleet-wide thundering herd that hits at the top of the hour (per `CronCreate`'s own guidance).
 

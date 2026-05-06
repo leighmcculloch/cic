@@ -1,4 +1,4 @@
-.PHONY: auto pr-emojis pr-reviews briefing meeting-prep
+.PHONY: auto pr-emojis pr-needs-review pr-reviews briefing meeting-prep
 
 DAYS ?= 1
 
@@ -7,6 +7,9 @@ auto:
 
 pr-emojis:
 	silo claude -p /pr-emojis
+
+pr-needs-review:
+	silo claude -p /pr-needs-review
 
 pr-reviews:
 	silo claude -p /pr-reviews
