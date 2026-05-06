@@ -1,0 +1,9 @@
+{
+  // PR-emojis classify CLI. See main.ts for the rules and CLI shape.
+  "tasks": {
+    "classify": "deno run --allow-net=api.github.com --allow-env=GITHUB_TOKEN ./main.ts"
+  },
+  "fmt": {
+    "lineWidth": 100
+  }
+}

@@ -1,0 +1,9 @@
+{
+  // Slack reaction CLI. See cli.ts for usage.
+  "tasks": {
+    "react": "deno run --env-file=$HOME/.zenv_apikey_slack_reaction_mcp --allow-net=slack.com --allow-env=SLACK_TOKEN ./cli.ts"
+  },
+  "fmt": {
+    "lineWidth": 100
+  }
+}

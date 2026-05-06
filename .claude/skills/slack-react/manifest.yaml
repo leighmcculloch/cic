@@ -1,6 +1,6 @@
 display_information:
-  name: mcp-reactions
-  description: Add emoji reactions to Slack messages via MCP.
+  name: slack-react
+  description: Add emoji reactions to Slack messages.
 oauth_config:
   scopes:
     user:
