@@ -18,15 +18,19 @@ This skill skips the `/loop` parser and calls `CronCreate` directly — for two 
 
 ## Schedule
 
-| Skill | `/loop` equivalent | Cron |
-|---|---|---|
-| `/pr-emojis` | `/loop 5m /pr-emojis` (with off-`:00` skew) | `2-59/5 * * * *` |
-| `/pr-needs-review` | `/loop 30m /pr-needs-review` (with off-`:00`/`:30` skew) | `7,37 * * * *` |
-| `/pr-reviews` | (not expressible via `/loop` — daily cadence) | `0 4 * * *` |
-| `/briefing 1` | (not expressible via `/loop` — daily cadence) | `17 4 * * *` |
-| `/briefing 7` | (not expressible via `/loop` — weekly cadence) | `27 4 * * 1` |
-| `/meeting-prep` | (not expressible via `/loop` — daily cadence) | `37 4 * * *` |
-| `/compact` | `/loop 30m /compact` (with off-`:00`/`:30` skew) | `13,43 * * * *` |
+The `Cron (AEST)` column expresses the intended local time in Brisbane (UTC+10, no DST). `CronCreate` interprets cron expressions in the host's local timezone, which on this machine is UTC, so the procedure converts AEST → UTC (subtract 10 hours; wrap day/DOW as needed) before calling `CronCreate`. The `Cron (UTC)` column is the pre-computed UTC value to actually pass.
+
+| Skill | `/loop` equivalent | Cron (AEST) | Cron (UTC) |
+|---|---|---|---|
+| `/pr-emojis` | `/loop 5m /pr-emojis` (with off-`:00` skew) | `2-59/5 * * * *` | `2-59/5 * * * *` |
+| `/pr-needs-review` | `/loop 30m /pr-needs-review` (with off-`:00`/`:30` skew) | `7,37 * * * *` | `7,37 * * * *` |
+| `/pr-reviews` | (not expressible via `/loop` — daily cadence) | `0 4 * * *` | `0 18 * * *` |
+| `/briefing 1` | (not expressible via `/loop` — daily cadence) | `17 4 * * *` | `17 18 * * *` |
+| `/briefing 7` | (not expressible via `/loop` — weekly cadence) | `27 4 * * 1` | `27 18 * * 0` |
+| `/meeting-prep` | (not expressible via `/loop` — daily cadence) | `37 4 * * *` | `37 18 * * *` |
+| `/compact` | `/loop 30m /compact` (with off-`:00`/`:30` skew) | `13,43 * * * *` | `13,43 * * * *` |
+
+Minute-only cadences (no specific hour) are timezone-invariant, so AEST and UTC values match. For entries with a specific hour, AEST 04:HH becomes UTC 18:HH on the previous calendar day; the weekly Monday entry shifts to Sunday in UTC.
 
 The cron minute fields are deliberately off `:00` to avoid the fleet-wide thundering herd that hits at the top of the hour (per `CronCreate`'s own guidance).
 
@@ -34,7 +38,7 @@ The cron minute fields are deliberately off `:00` to avoid the fleet-wide thunde
 
 1. Call `CronList` to see what is already scheduled.
 2. For each row above where there is no existing job whose `prompt` matches the slash command, call `CronCreate` with:
-   - `cron`: the value from the table
+   - `cron`: the value from the **`Cron (UTC)`** column (NOT the AEST column — `CronCreate` interprets cron in host-local time, which is UTC here)
    - `prompt`: the slash command (e.g. `/pr-emojis`)
    - `recurring`: `true`
    - `durable`: `false`
@@ -52,5 +56,5 @@ The cron minute fields are deliberately off `:00` to avoid the fleet-wide thunde
 ## Adding a new sub-skill
 
 1. Create `.claude/skills/<name>/SKILL.md` with its own task instructions.
-2. Add a row to the schedule table above with the desired cron expression. Prefer off-`:00` and off-`:30` minutes for any approximate cadence.
+2. Add a row to the schedule table above with the desired cron expression in **AEST**, then pre-compute and fill the **UTC** column (subtract 10 hours; wrap day/DOW as needed). Minute-only cadences are invariant — copy the same value to both columns. Prefer off-`:00` and off-`:30` minutes for any approximate cadence.
 3. Re-run `/auto` to register the new job.
