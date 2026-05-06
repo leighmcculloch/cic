@@ -22,18 +22,22 @@ Pick the *single most recent* applicable state:
 
 If none apply (e.g. I only opened the PR but have not reviewed/merged it), do nothing.
 
+If I am the author of the PR, only the `:merged:` state applies — skip `:eyes:`, `:speech_balloon:`, and `:white_check_mark:` even if I have pending/submitted reviews on my own PR.
+
 ## Procedure
 
-1. Confirm my GitHub identity via `mcp__github__get_me`.
-2. Search Slack for messages containing GitHub PR URLs using `slack_search_public_and_private` with a query like `github.com/ in:` or `https://github.com pull`. Page through results.
-3. Extract unique PR URLs of the form `https://github.com/<owner>/<repo>/pull/<number>`.
-4. For each unique PR URL:
-   a. Fetch the PR via `mcp__github__pull_request_read` (method `get`) and the reviews list (`pull_request_read` with method `get_reviews`) and merge state.
-   b. Determine if I am involved (author / reviewer / commenter / merger). If not, skip.
-   c. Determine which emoji applies per the table above.
-5. For each Slack message linking to that PR:
-   a. Skip if the desired reaction is already present from me.
-   b. Otherwise add the reaction.
+1. Confirm my GitHub identity via `mcp__github__get_me`. The classify script assumes `gh` is authenticated as that same user.
+2. Search Slack for messages containing GitHub PR URLs using `slack_search_public_and_private` with a query like `https://github.com pull`. Page through results until the desired window is covered.
+3. From the messages, build a list of `(channel, ts, pr_url)` tuples where `pr_url` matches `https://github.com/<owner>/<repo>/pull/<number>`. A single Slack message may contribute multiple tuples.
+4. Take the **unique** set of `pr_url`s and pass them all to `classify.sh` in one invocation:
+   ```
+   .claude/skills/pr-emojis/classify.sh leighmcculloch <url1> <url2> ...
+   ```
+   The script emits one JSONL line per URL: `{"url": ..., "emoji": "eyes|speech_balloon|white_check_mark|merged"|null, "reason": "..."}`. It already encodes the author-only-merged rule, the most-recent-review rule, and pagination of the reviews list — do **not** re-derive these client-side.
+5. Build a lookup `pr_url → emoji` from the script output. For each `(channel, ts, pr_url)` tuple where `emoji != null`:
+   - If my reaction with that emoji is already on the message, skip.
+   - Otherwise call `mcp__slack-reactions__add_reaction` with the channel, ts, and `name = emoji`.
+6. Report a brief summary of reactions applied.
 
 ## If a Slack reaction tool is not available
 
@@ -44,6 +48,7 @@ If the runtime exposes no `slack_*_reaction` tool, fall back to: open a single S
 - Never remove a reaction.
 - Never add a reaction that is already present from me.
 - Never react to messages that don't contain a PR URL.
-- Skip PRs where I am not an involved party.
+- Skip PRs the script returns as `emoji: null`.
 - If a single Slack message contains multiple PR URLs, evaluate each independently.
-- Be efficient — cache PR lookups within a run; the same PR may appear in many messages.
+- The script handles caching implicitly — pass each unique URL once and reuse the result for every message that links to it.
+- Do not re-implement the classification logic in the agent. The rules live in `classify.sh` so they stay in sync with this skill.

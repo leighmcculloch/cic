@@ -20,7 +20,7 @@ This skill skips the `/loop` parser and calls `CronCreate` directly — for two 
 
 | Skill | `/loop` equivalent | Cron |
 |---|---|---|
-| `/pr-emojis` | `/loop 1h /pr-emojis` | `7 * * * *` |
+| `/pr-emojis` | `/loop 5m /pr-emojis` (with off-`:00` skew) | `2-59/5 * * * *` |
 | `/pr-reviews` | (not expressible via `/loop` — daily cadence) | `7 4 * * *` |
 | `/briefing 1` | (not expressible via `/loop` — daily cadence) | `17 4 * * *` |
 | `/briefing 7` | (not expressible via `/loop` — weekly cadence) | `27 4 * * 1` |
