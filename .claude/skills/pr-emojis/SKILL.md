@@ -18,11 +18,11 @@ Pick the *single most recent* applicable state:
 | I have a pending review (started reviewing, not yet submitted) | `:eyes:` |
 | My most recent submitted review is `COMMENTED` or `CHANGES_REQUESTED` | `:speech_balloon:` |
 | My most recent submitted review is `APPROVED` | `:white_check_mark:` |
-| I merged the PR | `:merged:` |
+| I merged the PR, OR I authored a PR that someone merged | `:merged:` |
 
-If none apply (e.g. I only opened the PR but have not reviewed/merged it), do nothing.
+If none apply (e.g. I only opened the PR but it's still open and I haven't reviewed it), do nothing.
 
-If I am the author of the PR, only the `:merged:` state applies — skip `:eyes:`, `:speech_balloon:`, and `:white_check_mark:` even if I have pending/submitted reviews on my own PR.
+If I am the author of the PR, only the `:merged:` state applies — skip `:eyes:`, `:speech_balloon:`, and `:white_check_mark:` even if I have pending/submitted reviews on my own PR. Once my PR is merged (by anyone), it gets `:merged:`.
 
 ## Tools
 

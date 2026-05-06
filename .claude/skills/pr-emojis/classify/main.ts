@@ -11,8 +11,8 @@
 //    "reason": "..."}
 //
 // Rules (mirror .claude/skills/pr-emojis/SKILL.md):
-//   - I merged the PR                                         → merged
-//   - I am the author and not the merger                      → null (skip)
+//   - I merged the PR, OR I authored a PR that anyone merged  → merged
+//   - I am the author and the PR is not merged                → null (skip)
 //   - My most recent review state is PENDING                  → eyes
 //   - My most recent review state is APPROVED                 → white_check_mark
 //   - My most recent review state is COMMENTED/CHANGES_REQUESTED → speech_balloon
@@ -103,8 +103,14 @@ async function classifyOne(token: string, me: string, url: string): Promise<Resu
     .sort((a, b) => (a.submitted_at ?? "").localeCompare(b.submitted_at ?? ""));
   const latest = mine.at(-1);
 
-  if (pr.merged && merger === me) return { url, emoji: "merged", reason: "merged by me" };
-  if (author === me) return { url, emoji: null, reason: "author is me; not merged by me" };
+  if (pr.merged && (merger === me || author === me)) {
+    return {
+      url,
+      emoji: "merged",
+      reason: merger === me ? "merged by me" : "my pr was merged",
+    };
+  }
+  if (author === me) return { url, emoji: null, reason: "author is me; not merged" };
   if (!latest) return { url, emoji: null, reason: "no review or merge by me" };
   switch (latest.state) {
     case "PENDING":
