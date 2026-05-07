@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "slack-reactions": {
+      "command": "bash",
+      "args": [
+        "-c",
+        "deno run --env-file=$HOME/.zenv_apikey_slack_reaction_mcp --allow-net=slack.com --allow-env=SLACK_TOKEN ./mcp/slack-reactions/server.ts"
+      ]
+    }
+  }
+}

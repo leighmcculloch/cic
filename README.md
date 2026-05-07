@@ -16,12 +16,19 @@ These tasks are intended to be run inside [silo], a sandboxing wrapper that scop
 | [`/pr-reviews`](.claude/skills/pr-reviews/SKILL.md) | Picks a random unreviewed PR in the `@stellar` GitHub org, reviews it, and DMs the findings. |
 | [`/briefing`](.claude/skills/briefing/SKILL.md) | Drafts a standup update from Slack + GitHub + Calendar activity over the last N days and prepends it to the team Slack Canvas. |
 | [`/meeting-prep`](.claude/skills/meeting-prep/SKILL.md) | Drafts prep notes for today's meetings, pulling Slack + GitHub context from the last 7 days. |
-| [`/slack-react`](.claude/skills/slack-react/SKILL.md) | Adds an emoji reaction to a Slack message. Used as a script by other skills (e.g. `/pr-emojis`). Requires `SLACK_TOKEN`. |
+
+## MCP servers
+
+| Server | Purpose |
+|---|---|
+| [`slack-reactions`](mcp/slack-reactions/README.md) | Adds emoji reactions to Slack messages (used by `/pr-emojis`). Requires `SLACK_TOKEN`. |
 
 ## Layout
 
 ```
 .claude/skills/<name>/SKILL.md   # one directory per skill
+.mcp.json                        # project MCP server registry
+mcp/<name>/                      # in-repo MCP servers (e.g. slack-reactions)
 Makefile                         # one target per skill: `make <name>`
 silo.jsonc                       # silo sandbox config for `silo claude`
 ```

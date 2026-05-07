@@ -26,11 +26,11 @@ If I am the author of the PR, only the `:merged:` state applies — skip `:eyes:
 
 ## Tools
 
-This skill uses two Deno scripts plus another skill:
+This skill uses two Deno scripts plus an MCP tool:
 
 - `.claude/skills/pr-emojis/find/main.ts` — given my GitHub login and a day-window, hits the user activity API (`/users/<me>/events`) and emits one PR URL per line for every PR I've acted on (opened/merged/reviewed/commented). Reads `GITHUB_TOKEN`. Directly executable via shebang.
 - `.claude/skills/pr-emojis/classify/main.ts` — given my GitHub login and a list of PR URLs (args or stdin), emits JSONL with the chosen emoji per PR. Reads `GITHUB_TOKEN`. The rules above are encoded inside it — do **not** re-derive them in the agent.
-- The [`/slack-react`](../slack-react/SKILL.md) skill to post each reaction. See its SKILL.md for invocation; do not re-derive the deno command here.
+- `mcp__slack-reactions__add_reaction(channel, timestamp, name)` — registered via [`.mcp.json`](../../../.mcp.json), implemented at [`mcp/slack-reactions/`](../../../mcp/slack-reactions/README.md). Posts the reaction as me.
 
 ## Procedure
 
@@ -48,7 +48,7 @@ The algorithm starts from **GitHub activity**, not Slack: list the PRs I've acte
    1. Search Slack for messages referencing `pr_url` using `slack_search_public_and_private` with the URL as the query (page through if there are many). Capture every message that mentions it.
    2. For each Slack message:
       - If my reaction with that emoji is already on the message, skip.
-      - Otherwise post the reaction via [`/slack-react`](../slack-react/SKILL.md). `already_reacted` is a benign duplicate signal and can be ignored.
+      - Otherwise call `mcp__slack-reactions__add_reaction` with the channel ID, message `ts`, and emoji name (no colons). `already_reacted` is a benign duplicate signal and can be ignored.
 4. Report a brief summary of reactions applied (PR → emoji → message count).
 
 ## Rules
