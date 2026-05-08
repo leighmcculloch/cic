@@ -56,6 +56,7 @@ The algorithm starts from **GitHub activity**, not Slack: list the PRs I've acte
 - Never remove a reaction.
 - Never add a reaction that is already present from me.
 - Never react to messages that don't contain a PR URL.
+- Ignore messages in my own self-DM channel. These are outputs from other skills, not organic mentions.
 - Skip PRs the classify script returns as `emoji: null`.
 - A Slack message may reference multiple PRs; the procedure iterates per-PR (step 3), so the same message may legitimately get multiple reactions across different PRs.
 - Do not re-implement the classification logic in the agent. The rules live in `classify/main.ts` so they stay in sync with this skill.

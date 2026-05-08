@@ -48,4 +48,5 @@ If no PRs need review, send: "No unreviewed PRs found in the last 3 days."
 - Only count submitted reviews (APPROVED, CHANGES_REQUESTED, COMMENTED). Pending reviews do not count.
 - Do not filter by org — any PR linked in Slack qualifies, though in practice most will be `stellar/*`.
 - Deduplicate PRs that appear in multiple Slack messages.
+- Ignore Slack messages in my own self-DM channel (the channel this skill posts to). These are outputs from other skills, not organic mentions.
 - Do not post anything publicly — results go only to my Slack DM.
