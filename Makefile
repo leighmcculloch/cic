@@ -3,19 +3,19 @@
 DAYS ?= 1
 
 auto:
-	silo claude -p /auto
+	silo claude /auto
 
 pr-emojis:
-	silo claude -p /pr-emojis
+	silo claude /pr-emojis
 
 pr-needs-review:
-	silo claude -p /pr-needs-review
+	silo claude /pr-needs-review
 
 pr-reviews:
-	silo claude -p /pr-reviews
+	silo claude /pr-reviews
 
 briefing:
-	silo claude -p "/briefing $(DAYS)"
+	silo claude "/briefing $(DAYS)"
 
 meeting-prep:
-	silo claude -p /meeting-prep
+	silo claude /meeting-prep
