@@ -95,7 +95,9 @@ When there are multiple PRs for the same sub-task, list them inline separated by
 
 ## Output destination
 
-The update is written to a persistent Slack Canvas: https://stellarfoundation.slack.com/docs/T02B046LB/F0AV41TNT5Z
+The update is written to a persistent Slack Canvas:
+- For a 1 day period briefing: https://stellarfoundation.slack.com/docs/T02B046LB/F0AV41TNT5Z
+- For any other number of days briefing: https://stellarfoundation.slack.com/docs/T02B046LB/F0AV96HUA3U
 
 **Prepend** the new update to the canvas (so the latest entry is always at the top). Use a `##` header as a separator:
 
