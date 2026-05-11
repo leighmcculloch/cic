@@ -22,7 +22,7 @@ The `Cron (AEST)` column expresses the intended local time in Brisbane (UTC+10, 
 
 | Skill | `/loop` equivalent | Cron (AEST) | Cron (UTC) |
 |---|---|---|---|
-| `/pr-emojis` | `/loop 5m /pr-emojis` (with off-`:00` skew) | `2-59/5 * * * *` | `2-59/5 * * * *` |
+| `/pr-emojis` | `/loop 30m /pr-emojis` (with off-`:00` skew) | `2-59/5 * * * *` | `2-59/30 * * * *` |
 | `/pr-needs-review` | (not expressible via `/loop` — daily cadence) | `7 6,12 * * *` | `7 20,2 * * *` |
 | `/pr-reviews` | (not expressible via `/loop` — daily cadence) | `0 4 * * *` | `0 18 * * *` |
 | `/briefing 1` | (not expressible via `/loop` — daily cadence) | `17 4 * * *` | `17 18 * * *` |
